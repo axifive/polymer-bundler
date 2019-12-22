@@ -14,6 +14,7 @@
 
 var nopt = require('nopt');
 var fs = require('fs');
+var path = require('path');
 var vulcan = require('../lib/vulcan');
 
 var help = [
@@ -27,7 +28,9 @@ var help = [
   '  -v|--version: print version number',
   '  -p <arg>|--abspath <arg>: use <arg> as the "webserver root", make all adjusted urls absolute',
   '  --inline-scripts: Inline external scripts',
+  '  --bundle-scripts: Combine all scripts to bundle.js',
   '  --inline-css: Inline external stylesheets',
+  '  --combine-css: Combine all stylesheets to one style.css file',
   '  --add-import <path>: Add this import to the target HTML before vulcanizing. Can be used multiple times.',
   '  --exclude <path>: exclude a subpath from root. Use multiple times to exclude multiple paths. Tags to excluded paths are kept.',
   '  --strip-exclude: Exclude a subpath and strip the link that includes it.',
@@ -85,7 +88,9 @@ var args = nopt(
     'strip-comments': Boolean,
     'no-implicit-strip': Boolean,
     'inline-scripts': Boolean,
+    'bundle-scripts': Boolean,
     'inline-css': Boolean,
+    'combine-css': Boolean,
     'out-html': String,
     'out-request-list': String
   },
@@ -129,11 +134,13 @@ args.stripExcludes = args['strip-exclude'] || [];
 args.stripComments = args['strip-comments'];
 args.implicitStrip = !args['no-implicit-strip'];
 args.inlineScripts = args['inline-scripts'];
+args.bundleScripts = args['bundle-scripts'];
 args.inlineCss = args['inline-css'];
+args.combineCss = args['combine-css'];
 args.polymer2 = args['polymer2'];
 
 var vulcanize = new vulcan(args);
-vulcanize.process(target, function(err, content) {
+vulcanize.process(target, function(err, content, script, style) {
   if (err) {
     process.stderr.write(require('util').inspect(err));
     process.exit(1);
@@ -144,6 +151,14 @@ vulcanize.process(target, function(err, content) {
       return !vulcanize.isExcludedHref(url);
     });
     fs.writeFileSync(args['out-request-list'], urls.join('\n') + '\n');
+  }
+
+  if (args['bundle-scripts'] && script) {
+    fs.writeFileSync(path.join(path.dirname(args['out-html']), 'bundle.js'), script + '\n');
+  }
+
+  if (args['combine-css'] && style) {
+    fs.writeFileSync(path.join(path.dirname(args['out-html']), 'style.css'), style + '\n');
   }
 
   if (args['out-html']) {
