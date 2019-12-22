@@ -28,7 +28,9 @@ for this step).
 - `--exclude <path>`: exclude a subpath from root. Use multiple times to exclude multiple paths. Tags (imports/scripts/etc) that reference an excluded path are left in-place, meaning the resources are not inlined. ex: `--exclude=elements/x-foo.html --exclude=elements/x-bar.html`
 - `--strip-exclude`: Exclude a subpath and remove any links referencing it.
 - `--inline-scripts`: Inline external scripts.
+- `--bundle-scripts`: Combine all scripts to one bundle.js file.
 - `--inline-css`: Inline external stylesheets.
+- `--combine-css`: Combine all stylesheets to one style.css file.
 - `--add-import <path>`: Add this import to the target HTML before vulcanizing. Can be used multiple times.
 - `--redirect <uri>|<path>`: Takes an argument in the form of URI|PATH where url is a URI composed of a protocol, hostname, and path and PATH is a local filesystem path to replace the matched URI part with. Multiple redirects may be specified; the earliest ones have the highest priority.
 - `--strip-comments`: Strips all HTML comments not containing an @license from the document.
